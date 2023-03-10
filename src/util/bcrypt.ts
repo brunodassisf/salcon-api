@@ -1,8 +1,15 @@
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 const saltRounds = 10;
 
-export default async function cryptHash(password: string) {
-  const hash = bcrypt.hashSync(password, saltRounds);
+async function cryptHash(password: string) {
+  const hash = await bcrypt.hash(password, saltRounds);
   return hash;
 }
+
+async function compareHash(password: string, hash: string) {
+  const isAuth = bcrypt.compareSync(password, hash);
+  return isAuth;
+}
+
+export { cryptHash, compareHash };

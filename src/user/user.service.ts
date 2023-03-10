@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
-import cryptHash from 'src/util/bcrypt';
+import { cryptHash } from 'src/util/bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,7 +13,7 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { password, email } = createUserDto;
+    const { password, email, ...result } = createUserDto;
 
     const existUser = await this.prisma.user.findFirst({ where: { email } });
 
@@ -25,10 +25,11 @@ export class UserService {
 
     try {
       await this.prisma.user.create({
-        data: { hash, ...createUserDto },
+        data: { hash, email, ...result },
       });
       return { msg: 'Usuário cadastro com sucesso' };
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('Erro');
     }
   }
@@ -37,8 +38,13 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} user`;
+  }
+
+  async findOneByEmail(email: string) {
+    const user = await this.prisma.user.findFirst({ where: { email } });
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
