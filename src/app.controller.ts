@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
@@ -17,5 +17,10 @@ export class AppController {
   @Get('profile')
   getProfile(@Req() req) {
     return req.user;
+  }
+
+  @Get('refresh')
+  refreshToken(@Body() body) {
+    return this.authService.validateToken(body);
   }
 }

@@ -34,17 +34,30 @@ export class UserService {
     }
   }
 
+  async findOneByEmail(email: string) {
+    const user = await this.prisma.user.findFirst({ where: { email } });
+    return user;
+  }
+
+  async findOneById(id: string) {
+    const user = await this.prisma.user.findFirst({ where: { id } });
+    const { hash, ...result } = user;
+    return result;
+  }
+
+  async findOneAndUpdate(id: string, { refresh_token }: any) {
+    await this.prisma.user.update({
+      where: { id },
+      data: { refresh_token },
+    });
+  }
+
   findAll() {
     return `This action returns all user`;
   }
 
   async findOne(id: number) {
     return `This action returns a #${id} user`;
-  }
-
-  async findOneByEmail(email: string) {
-    const user = await this.prisma.user.findFirst({ where: { email } });
-    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
